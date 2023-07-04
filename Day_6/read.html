@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Read Entries</title>
+</head>
+<body>
+    <h1>Read Entries</h1>
+    {% if data %}
+        <table>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+            {% for key, value in data.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No entries found.</p>
+    {% endif %}
+    <p><a href="/create">Create New Entry</a></p>
+    <p><a href="/update">Update Entry</a></p>
+    <p><a href="/delete">Delete Entry</a></p>
+</body>
+</html>
