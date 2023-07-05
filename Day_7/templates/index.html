@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        {% if content == "home" %}
+            <h1>Welcome to the Restaurant App!</h1>
+            <p>Choose an option from the menu:</p>
+            <ul>
+                <li><a href="{{ url_for('display_menu') }}">Display Menu</a></li>
+                <li><a href="{{ url_for('add_dish') }}">Add Dish</a></li>
+                <li><a href="{{ url_for('update_dish_availability') }}">Update Dish Availability</a></li>
+                <li><a href="{{ url_for('sign_up') }}">Sign Up</a></li>
+                <li><a href="{{ url_for('log_in') }}">Log In</a></li>
+            </ul>
+        {% elif content == "menu" %}
+            <h1>Menu</h1>
+            <table>
+                <tr>
+                    <th>Dish ID</th>
+                    <th>Dish Name</th>
+                    <th>Price</th>
+                    <th>Availability</th>
+                </tr>
+                {% for dish in menu %}
+                <tr>
+                    <td>{{ dish.dish_id }}</td>
+                    <td>{{ dish.dish_name }}</td>
+                    <td>{{ dish.price }}</td>
+                    <td>{{ dish.availability }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% elif content == "add_dish" %}
+            <h1>Add Dish</h1>
+            <form action="{{ url_for('add_dish') }}" method="post">
+                <label for="dish_id">Dish ID:</label>
+                <input type="text" id="dish_id" name="dish_id" required><br>
+                <label for="dish_name">Dish Name:</label>
+                <input type="text" id="dish_name" name="dish_name" required><br>
+                <label for="price">Price:</label>
+                <input type="text" id="price" name="price" required><br>
+                <label for="availability">Availability:</label>
+                <input type="checkbox" id="availability" name="availability"><br>
+                <input type="submit" value="Add Dish">
+            </form>
+        {% elif content == "update_availability" %}
+            <h1>Update Dish Availability</h1>
+            <form action="{{ url_for('update_dish_availability') }}" method="post">
+                <label for="dish_id">Dish ID:</label>
+                <input type="text" id="dish_id" name="dish_id" required><br>
+                <label for="availability">Availability:</label>
+                <input type="checkbox" id="availability" name="availability"><br>
+                <input type="submit" value="Update Availability">
+            </form>
+        {% elif content == "signup" %}
+            <h1>Sign Up</h1>
+            <form action="{{ url_for('sign_up') }}" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required><br>
+                <input type="submit" value="Sign Up">
+            </form>
+        {% elif content == "login" %}
+            <h1>Log In</h1>
+            <form action="{{ url_for('log_in') }}" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required><br>
+                <input type="submit" value="Log In">
+            </form>
+        {% elif content == "main_menu" %}
+            <h1>Main Menu</h1>
+            <h2>Welcome, {{ username }}!</h2>
+            <form action="{{ url_for('main_menu', username=username) }}" method="post">
+                <input type="submit" name="add_funds" value="Add Funds">
+                <input type="submit" name="display_menu" value="Display Menu">
+                <input type="submit" name="add_dish" value="Add Dish">
+                <input type="submit" name="update_availability" value="Update Dish Availability">
+                <input type="submit" name="place_order" value="Place Order">
+                <input type="submit" name="exit" value="Exit">
+            </form>
+        {% elif content == "add_funds" %}
+            <h1>Add Funds</h1>
+            <form action="{{ url_for('add_funds', username=username) }}" method="post">
+                <label for="amount">Amount:</label>
+                <input type="text" id="amount" name="amount" required><br>
+                <input type="submit" value="Add Funds">
+            </form>
+        {% elif content == "place_order" %}
+            <h1>Place Order</h1>
+            <form action="{{ url_for('place_order', username=username) }}" method="post">
+                <ul>
+                    {% for dish in menu %}
+                        {% if dish.availability %}
+                            <li>
+                                <input type="checkbox" name="order_item" value="{{ dish.dish_id }}">
+                                {{ dish.dish_name }} - ${{ dish.price }}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <input type="submit" value="Place Order">
+            </form>
+        {% elif content == "order_status" %}
+            <h1>Order Status</h1>
+            <h2>Order ID: {{ order.order_id }}</h2>
+            <h3>Customer Name: {{ order.customer_name }}</h3>
+            <h3>Status: {{ order.status }}</h3>
+            <h3>Dishes:</h3>
+            <ul>
+                {% for dish in order.dishes %}
+                    <li>{{ dish.dish_name }} - ${{ dish.price }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</body>
+</html>
