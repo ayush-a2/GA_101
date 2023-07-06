@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <h1>Menu</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Dish Name</th>
+          <th>Price</th>
+          <th>Availability</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dish in dishes %}
+          <tr>
+            <td>{{ dish[1] }}</td>
+            <td>{{ dish[2] }}</td>
+            <td>{{ dish[3] }}</td>
+            <td>
+              <a href="/update_dish/{{ dish[0] }}">Update</a>
+              <a href="/remove_dish/{{ dish[0] }}">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>Add/Update Dish</h2>
+    <form action="/add_dish" method="POST">
+      <h3>Add Dish</h3>
+      <label for="dish_name">Dish Name:</label>
+      <input type="text" id="dish_name" name="dish_name" required>
+      <label for="price">Price:</label>
+      <input type="text" id="price" name="price" required>
+      <label for="availability">Availability:</label>
+      <select id="availability" name="availability" required>
+        <option value="Available">Available</option>
+        <option value="Not Available">Not Available</option>
+      </select>
+      <input type="submit" value="Add Dish">
+    </form>
+  </body>
+</html>
