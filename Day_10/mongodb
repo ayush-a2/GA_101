@@ -1,0 +1,108 @@
+1. db.createCollection("Customers", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "email", "address", "phone_number"],
+      properties: {
+        id: {
+          bsonType: "int",
+          description: "ID of the customer"
+        },
+        name: {
+          bsonType: "string",
+          description: "Name of the customer"
+        },
+        email: {
+          bsonType: "string",
+          description: "Email address of the customer"
+        },
+        address: {
+          bsonType: "string",
+          description: "Address of the customer"
+        },
+        phone_number: {
+          bsonType: "string",
+          description: "Phone number of the customer"
+        }
+      }
+    }
+  }
+})
+
+-------------------------------------------------------------------------------------------
+
+2.db.Customers.insertMany([
+    {
+      name: 'Rajani',
+      email: 'rjne@example.com',
+      address: '123 Main St, City',
+      phone_number: '1234567890'
+    },
+    {
+      name: 'Rachu',
+      email: 'rc.smith@example.com',
+      address: '456 Elm St, Town',
+      phone_number: '9876543210'
+    }
+  ])
+
+  ------------------------------------------------------------------------------------------
+
+  3.db.Customers.find()
+
+  ----------------------------------------------------------------------------------------
+
+  4.db.Customers.find({}, { name: 1, email: 1 })
+
+-----------------------------------------------------------------------------------------
+
+5.db.Customers.findOne({ id: 3 })
+
+-----------------------------------------------------------------------------------------
+
+6.db.Customers.find({ name: { $regex: '^A' } })
+ --------------------------------------------------------------------------------------
+
+ 7.db.Customers.find().sort({ name: -1 })
+
+ -----------------------------------------------------------------------------------
+
+ 8.db.Customers.updateOne({ id: 4 }, { $set: { address: 'New Address' } })
+
+ ------------------------------------------------------------------------------------
+
+ 9. db.Customers.find().sort({ id: 1 }).limit(3)
+
+ ---------------------------------------------------------------------------------
+
+ 10.db.Customers.deleteOne({ id: 2 })
+------------------------------------------------------------------------------------
+
+11.db.Customers.countDocuments()
+-------------------------------------------------------------------------------------
+12. db.Customers.find().sort({ id: 1 }).skip(2).limit(18446744073709551615)
+
+-----------------------------------------------------------------------------------
+13.db.Customers.find({
+    $and: [
+      { id: { $gt: 2 } },
+      { name: { $regex: '^B' } }
+    ]
+  })
+
+  -------------------------------------------------------------------------------------
+
+  14.db.Customers.find({
+    $or: [
+      { id: { $lt: 3 } },
+      { name: { $regex: 's$' } }
+    ]
+  })
+
+  ------------------------------------------------------------------------------------- 
+  15.db.Customers.find({
+    $or: [
+      { phone_number: null },
+      { phone_number: '' }
+    ]
+  })
