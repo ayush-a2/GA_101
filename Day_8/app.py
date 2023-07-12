@@ -11,7 +11,7 @@ mysql = MySQL(app)
 
 
 # Route for displaying dishes
-@app.route('/dishes')
+@app.route('/')
 def display_dishes():
     cur = mysql.connection.cursor()
     cur.execute('SELECT * FROM dishes')

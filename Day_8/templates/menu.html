@@ -11,6 +11,7 @@
           <th>Dish Name</th>
           <th>Price</th>
           <th>Availability</th>
+         ```html
           <th>Actions</th>
         </tr>
       </thead>
@@ -43,5 +44,46 @@
       </select>
       <input type="submit" value="Add Dish">
     </form>
+
+    <h2>Chat with the Zomato ChatBot</h2>
+    <div id="chatbot-container">
+      <div id="chatlog">
+        <p>Welcome to Zomato ChatBot! How can I assist you today?</p>
+      </div>
+      <form id="chatbot-form">
+        <input type="text" id="user-message" placeholder="Type your message here..." autocomplete="off" required>
+        <button type="submit">Send</button>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById('chatbot-form');
+      const input = document.getElementById('user-message');
+      const chatlog = document.getElementById('chatlog');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const userMessage = input.value;
+        const messageElement = document.createElement('p');
+        messageElement.textContent = `You: ${userMessage}`;
+        chatlog.appendChild(messageElement);
+        input.value = '';
+
+        // Send user message to the server for processing
+        fetch('/chatbot', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: `user_message=${userMessage}`
+        })
+        .then(response => response.text())
+        .then(response => {
+          const botMessageElement = document.createElement('p');
+          botMessageElement.textContent = `Zomato ChatBot: ${response}`;
+          chatlog.appendChild(botMessageElement);
+        });
+      });
+    </script>
   </body>
 </html>

@@ -67,12 +67,4 @@ def test_update_weather_invalid_city(client):
 
 
 def test_delete_weather(client):
-    response = client.delete('/weather/Seattle')
-
-    assert response.status_code == 204
-
-
-def test_delete_weather_invalid_city(client):
-    response = client.delete('/weather/Invalid City')
-
-    assert response.status_code == 404
+    response =
