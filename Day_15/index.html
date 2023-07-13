@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Object Classifier</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    /* Additional CSS styles */
+    /* Add your custom styles here */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f8f8f8;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    h1 {
+      margin-top: 20px;
+    }
+    
+    #webcam-container {
+      margin: 20px auto;
+    }
+    
+    #label-container {
+      margin-top: 20px;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px;
+      background-color: #f1f1f1;
+      border-radius: 5px;
+    }
+    
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      opacity: 0.8;
+    }
+
+    #result {
+      margin-top: 20px;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px;
+      background-color: #f1f1f1;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Intelligent Object Classifier</h1>
+  <div id="webcam-container"></div>
+  <div id="label-container"></div>
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script>
+    // the link to your model provided by Teachable Machine export panel
+    const URL = 'https://teachablemachine.withgoogle.com/models/bXy2kDNi/';
+
+    let model, webcam, labelContainer, maxPredictions;
+
+    // Load the image model and setup the webcam
+    async function init() {
+        const modelURL = URL + 'model.json';
+        const metadataURL = URL + 'metadata.json';
+
+        // Load the model and metadata
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Setup the webcam
+        const flip = true; // Whether to flip the webcam
+        webcam = new tmImage.Webcam(200, 200, flip); // Width, height, flip
+        await webcam.setup(); // Request access to the webcam
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        // Append elements to the DOM
+        const webcamContainer = document.getElementById('webcam-container');
+        webcamContainer.appendChild(webcam.canvas);
+        
+        labelContainer = document.getElementById('label-container');
+        for (let i = 0; i < maxPredictions; i++) {
+            const label = document.createElement('div');
+            labelContainer.appendChild(label);
+        }
+    }
+
+    // Run the webcam image through the image model
+    async function predict() {
+        const prediction = await model.predict(webcam.canvas);
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction =
+                prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
+            labelContainer.childNodes[i].innerHTML = classPrediction;
+        }
+    }
+
+    // Main loop function
+    async function loop() {
+        webcam.update(); // Update the webcam frame
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    // Initialize the application
+    init();
+
+    // Handle fruit classification
+    function handleFruitClassification(prediction) {
+      const fruitClass = prediction.className;
+      const resultDiv = document.getElementById('result');
+      
+      if (fruitClass === 'fruit') {
+        const fruitDetails = {
+          name: 'Apple',
+          nutritionalValues: {
+            calories: 52,
+            carbohydrates: 14,
+            fiber: 2.4,
+            vitamins: ['Vitamin C', 'Vitamin A'],
+          },
+          origin: 'United States',
+          seasonality: 'Year-round',
+        };
+
+        resultDiv.innerHTML = `
+          <h3>${fruitDetails.name}</h3>
+          <p>Nutritional Values:</p>
+          <ul>
+            <li>Calories: ${fruitDetails.nutritionalValues.calories}</li>
+            <li>Carbohydrates: ${fruitDetails.nutritionalValues.carbohydrates}</li>
+            <li>Fiber: ${fruitDetails.nutritionalValues.fiber}</li>
+            <li>Vitamins: ${fruitDetails.nutritionalValues.vitamins.join(', ')}</li>
+          </ul>
+          <p>Origin: ${fruitDetails.origin}</p>
+          <p>Seasonality: ${fruitDetails.seasonality}</p>
+        `;
+      }
+    }
+
+    // Handle book classification
+    function handleBookClassification(prediction) {
+      const bookClass = prediction.className;
+      const resultDiv = document.getElementById('result');
+      
+      if (bookClass === 'book') {
+        const bookDetails = {
+          title: 'To Kill a Mockingbird',
+          author: 'Harper Lee',
+          publisher: 'J. B. Lippincott & Co.',
+          publicationYear: 1960,
+          summary: 'To Kill a Mockingbird is a novel by Harper Lee. It depicts the experiences of Scout Finch, a young girl growing up in the fictional town of Maycomb, Alabama, during the 1930s.',
+        };
+
+        resultDiv.innerHTML = `
+          <h3>${bookDetails.title}</h3>
+          <p>Author: ${bookDetails.author}</p>
+          <p>Publisher: ${bookDetails.publisher}</p>
+          <p>Publication Year: ${bookDetails.publicationYear}</p>
+          <p>Summary: ${bookDetails.summary}</p>
+        `;
+      }
+    }
+
+    // Handle classification results
+    function handleClassificationResults(prediction) {
+      const className = prediction.className;
+
+      // Call the appropriate classification handler based on the predicted class
+      if (className === 'fruit') {
+        handleFruitClassification(prediction);
+      } else if (className === 'book') {
+        handleBookClassification(prediction);
+      }
+    }
+
+    // Update the classification results with object-specific details
+    function updateClassificationResults() {
+      const prediction = model.predict(webcam.canvas)[0];
+      handleClassificationResults(prediction);
+    }
+
+    // Add event listener to the button
+    const button = document.querySelector('button');
+    button.addEventListener('click', updateClassificationResults);
+  </script>
+
+  <div>
+    <h2>Outcome</h2>
+    <p>
+      The Intelligent Object Classifier aims to provide an easy, quick, and accurate way for users to get detailed information about common objects. By leveraging machine learning and AI, this application showcases how technology can simplify daily tasks and offer practical, user-friendly solutions. The project sets the stage for more advanced AI implementations, demonstrating the potential of AI in various domains.
+    </p>
+  </div>
+</body>
+</html>
